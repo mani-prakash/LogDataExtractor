@@ -140,10 +140,10 @@ public class Main
             list.add(map.get(key));
         }
 
-        printResults(list, N);
+        printResults(list, N, type);
     }
 
-    public static void printResults(ArrayList<JSONObject> requests, int N)
+    public static void printResults(ArrayList<JSONObject> requests, int N, String type)
     {
         Collections.sort(requests, new Comparator<JSONObject>()
         {
@@ -155,7 +155,13 @@ public class Main
                 return bCount-aCount;
             }
         });
-
+        if(type.equalsIgnoreCase("url"))
+        {
+            System.out.println("ImageName          Count       Avg Response Time");
+        }
+        else{
+            System.out.println("user          Count       Avg Response Time");
+        }
         for(int i=0; i<N&&i<requests.size();i++)
         {
             JSONObject jsonObject = requests.get(i);
@@ -170,7 +176,6 @@ public class Main
     public static void main(String args[]) throws ParseException, IOException
     {
         //from to N type folder
-        System.out.println(args[0]);
         long from = Long.parseLong(args[0]);//1452203928;
         long to = Long.parseLong(args[1]);//1462658328;
         int N = Integer.parseInt(args[2]);
@@ -189,7 +194,6 @@ public class Main
 
         for(File file : folder.listFiles())
         {
-            System.out.println(file.getName());
             imageRequests.addAll(getImageRequests(readData(file)));
         }
 
