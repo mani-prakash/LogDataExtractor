@@ -1,7 +1,6 @@
 # LogDataExtractor
-Run Main class < br >
+Run Main class < br />
 Input should be given from cmd line
-
 Input format
 from to N type folder
 from , to --> time Range epoch time is secs
