@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.zip.Inflater;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,7 +14,6 @@ import org.json.simple.parser.ParseException;
 
 public class Main
 {
-  //  org.json.JsonObject d;
     public static ArrayList<JSONObject> readData(File file) throws IOException, ParseException
     {
         FileInputStream fileInputStream = new FileInputStream(file);
@@ -26,19 +24,18 @@ public class Main
 
         while ((c = fileInputStream.read()) != -1)
         {
-            char character = (char)c;
+            char character = (char) c;
 
-            if(character == Constants.MEW_LINE)
+            if (character == Constants.MEW_LINE)
             {
                 int index = data.indexOf(Constants.LEFT_CURLY_BRACKET);
-                if(index!=-1)
+                if (index != -1)
                 {
                     String js = data.substring(index);
                     list.add((JSONObject) jsonParser.parse(js));
                 }
                 data = "";
-            }
-            else
+            } else
             {
                 data += character;
             }
@@ -49,11 +46,11 @@ public class Main
 
     public static boolean isImage(String url)
     {
-        if( ( url.contains(Constants.JPG_EXTENSION) ||
-              url.contains(Constants.JPEG_EXTENSION) ||
-              url.contains(Constants.PNG_EXTENSION)) &&
-              !(url.contains(Constants.CMS_ADMIN) || url.contains(Constants.ASSETS))
-             )
+        if ((url.contains(Constants.JPG_EXTENSION) ||
+                url.contains(Constants.JPEG_EXTENSION) ||
+                url.contains(Constants.PNG_EXTENSION)) &&
+                !(url.contains(Constants.CMS_ADMIN) || url.contains(Constants.ASSETS))
+                )
         {
             return true;
         }
@@ -65,18 +62,18 @@ public class Main
     {
         ArrayList<JSONObject> imageRequests = new ArrayList<JSONObject>();
 
-        for(JSONObject jsonObject : requests)
+        for (JSONObject jsonObject : requests)
         {
             String http_request = jsonObject.get(Constants.HTTP_REQUEST).toString();
             String[] strList = http_request.split(" ");
 
-            if(strList.length != 3)
+            if (strList.length != 3)
             {
                 continue;
             }
             String url = strList[1];
 
-            if(isImage(url))
+            if (isImage(url))
             {
                 jsonObject.put(Constants.URL, url);
                 imageRequests.add(jsonObject);
@@ -90,11 +87,11 @@ public class Main
     {
         ArrayList<JSONObject> inRange = new ArrayList<JSONObject>();
 
-        for(JSONObject jsonObject : requests)
+        for (JSONObject jsonObject : requests)
         {
             long timestamp = Long.parseLong(jsonObject.get(Constants.TIMESTAMP).toString());
 
-            if(timestamp>from&&timestamp<to)
+            if (timestamp > from && timestamp < to)
             {
                 inRange.add(jsonObject);
             }
@@ -105,27 +102,26 @@ public class Main
 
     public static void getImageStats(int N, ArrayList<JSONObject> imageRequests, String type)
     {
-        HashMap<String,JSONObject> map = new HashMap();
+        HashMap<String, JSONObject> map = new HashMap();
 
-        for(JSONObject jsonObject : imageRequests)
+        for (JSONObject jsonObject : imageRequests)
         {
             String key = jsonObject.get(type).toString();
             JSONObject mapObject = null;
 
-            if(map.containsKey(key))
+            if (map.containsKey(key))
             {
                 mapObject = map.get(key);
                 int count = Integer.parseInt(mapObject.get(Constants.COUNT).toString());
                 int response_time = Integer.parseInt(mapObject.get(Constants.RESPONSE_TIME).toString());
                 int _time = Integer.parseInt(jsonObject.get(Constants.RESPONSE_TIME).toString());
-                mapObject.put(Constants.COUNT ,count+1);
-                mapObject.put(Constants.RESPONSE_TIME , response_time + _time);
-            }
-            else
+                mapObject.put(Constants.COUNT, count + 1);
+                mapObject.put(Constants.RESPONSE_TIME, response_time + _time);
+            } else
             {
                 mapObject = new JSONObject();
-                mapObject.put(Constants.COUNT,1);
-                mapObject.put(Constants.KEY,key);
+                mapObject.put(Constants.COUNT, 1);
+                mapObject.put(Constants.KEY, key);
                 int response_time = Integer.parseInt(jsonObject.get(Constants.RESPONSE_TIME).toString());
                 mapObject.put(Constants.RESPONSE_TIME, response_time);
             }
@@ -135,7 +131,7 @@ public class Main
 
         ArrayList<JSONObject> list = new ArrayList<JSONObject>();
 
-        for(String key : map.keySet())
+        for (String key : map.keySet())
         {
             list.add(map.get(key));
         }
@@ -152,30 +148,29 @@ public class Main
                 int aCount = Integer.parseInt(a.get(Constants.COUNT).toString());
                 int bCount = Integer.parseInt(b.get(Constants.COUNT).toString());
 
-                return bCount-aCount;
+                return bCount - aCount;
             }
         });
-        if(type.equalsIgnoreCase("url"))
+        if (type.equalsIgnoreCase(Constants.URL))
         {
-            System.out.println("ImageName          Count       Avg Response Time");
+            System.out.println("ImageName     Count   Avg Response Time");
+        } else
+        {
+            System.out.println("user   Count   Avg Response Time");
         }
-        else{
-            System.out.println("user          Count       Avg Response Time");
-        }
-        for(int i=0; i<N&&i<requests.size();i++)
+        for (int i = 0; i < N && i < requests.size(); i++)
         {
             JSONObject jsonObject = requests.get(i);
             String key = jsonObject.get(Constants.KEY).toString();
             int count = Integer.parseInt(jsonObject.get(Constants.COUNT).toString());
-            int response_time = Integer.parseInt(jsonObject.get(Constants.RESPONSE_TIME).toString())/count;
+            int response_time = Integer.parseInt(jsonObject.get(Constants.RESPONSE_TIME).toString()) / count;
 
-            System.out.println(key+" "+count+" "+response_time);
+            System.out.println(key + "   " + count + "   " + response_time);
         }
     }
 
     public static void main(String args[]) throws ParseException, IOException
     {
-        //from to N type folder
         long from = Long.parseLong(args[0]);//1452203928;
         long to = Long.parseLong(args[1]);//1462658328;
         int N = Integer.parseInt(args[2]);
@@ -184,7 +179,7 @@ public class Main
 
         String type = Constants.REMOTE_ADDR;
 
-        if(ty==1)
+        if (ty == 1)
         {
             type = Constants.URL;
         }
@@ -192,7 +187,7 @@ public class Main
         File folder = new File(path);
         ArrayList<JSONObject> imageRequests = new ArrayList<JSONObject>();
 
-        for(File file : folder.listFiles())
+        for (File file : folder.listFiles())
         {
             imageRequests.addAll(getImageRequests(readData(file)));
         }
