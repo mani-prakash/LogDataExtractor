@@ -189,7 +189,8 @@ public class Main
 
         for (File file : folder.listFiles())
         {
-            imageRequests.addAll(getImageRequests(readData(file)));
+            ArrayList fileRequests = getInRangeRequests(from, to, getImageRequests(readData(file)));
+            imageRequests.addAll(fileRequests);
         }
 
         System.out.println(imageRequests.size());
